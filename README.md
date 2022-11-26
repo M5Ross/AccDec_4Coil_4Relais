@@ -2,14 +2,17 @@
 
 Dcc Accessory Decoder to drive 4 electromagnetic coils plus 4 relais for frog polarization
 
-Originally derived from an example of library NmraDcc
+Originally derived from an example of library NmraDcc.
 
 Library required:
 
-- NmraDcc (public)
-- ConfCVlib (manual installation)
-- DccSerialCom (manual installation)
+- [NmraDcc] (public)
+- [ConfCVlib] (manual installation)
+- [DccSerialCom] (manual installation)
 
-Designed to be configured with custom PC tool... soon available
+Designed to be configured with the custom PC tool [DecoderConfigurator].
 
-IN PROGRESS...
+[NmraDcc]: https://github.com/mrrwa/NmraDcc
+[ConfCVlib]: https://github.com/M5Ross/ConfCVlib
+[DccSerialCom]: https://github.com/M5Ross/DccSerialCom
+[DecoderConfigurator]: https://github.com/M5Ross/DecoderConfigurator
