@@ -10,6 +10,16 @@ Library required:
 - [ConfCVlib] (manual installation)
 - [DccSerialCom] (manual installation)
 
+Features:
+
+- 4 available outputs for "double coils" switches (common positive).
+- 4 mocro 12V relais for frog polarization with N, NO and NC contacts.
+- output drive stages with multiple ULN2803 chips.
+- customizable pulse time or continuos mode in case to drive light bulbs.
+- fail safe time to avoid coils overcharging and burnout.
+- output voltage up to 20 Vdc. Separate power socket or autopower via DCC.
+- Sigle address mode (continuos address for each output) or multiple address mode (each output has it own address).
+
 Designed to be configured with the custom PC tool [DecoderConfigurator].
 
 [NmraDcc]: https://github.com/mrrwa/NmraDcc
