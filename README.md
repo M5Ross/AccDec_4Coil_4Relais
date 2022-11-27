@@ -20,7 +20,7 @@ Features:
 - output voltage up to 20 Vdc. Separate power socket or autopower via DCC.
 - Sigle address mode (continuos address for each output) or multiple address mode (each output has it own address).
 
-Designed to be configured with the custom PC tool [DecoderConfigurator].
+Designed to be configured with the custom PC tool [DecoderConfigurator], or in standardize way via CV
 
 [NmraDcc]: https://github.com/mrrwa/NmraDcc
 [ConfCVlib]: https://github.com/M5Ross/ConfCVlib
