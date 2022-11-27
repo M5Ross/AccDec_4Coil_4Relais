@@ -1,0 +1,71 @@
+G04 FreePCB version 1.200*
+G04 C:\Users\Jaco\Desktop\fishino UNO\Dec4Coil4Rele\CAMb\bottom_silk.grb*
+G04 bottom silk layer *
+G04 Scale: 100 percent, Rotated: No, Reflected: No *
+%FSLAX26Y26*%
+%MOIN*%
+%LNTop*%
+%ADD10C,0.005000*%
+G90*
+G70D02*
+
+G04 ----------------------- Draw board outline (positive)*
+%LPD*%
+G54D10*
+G01X0Y0D02*
+G01X3700000Y0D01*
+G04 end of side 1*
+G01X3700000Y2600000D01*
+G04 end of side 2*
+G01X0Y2600000D01*
+G04 end of side 3*
+G01X0Y0D01*
+
+G04 -------------- Draw Parts, Pads, Traces, Vias and Text (positive)*
+%LPD*%
+G04 Draw part atmega*
+G04 Draw part a7*
+G04 Draw part a16*
+G04 Draw part a18*
+G04 Draw part a19*
+G04 Draw part a20*
+G04 Draw part a21*
+G04 Draw part a26*
+G04 Draw part a27*
+G04 Draw part a28*
+G04 Draw part a29*
+G04 Draw part b11*
+G04 Draw part b14*
+G04 Draw part b16*
+G04 Draw part b17*
+G04 Draw part b44*
+G04 Draw part d3*
+G04 Draw part e1*
+G04 Draw part e2*
+G04 Draw part c1*
+G04 Draw part c2*
+G04 Draw part c3*
+G04 Draw part c4*
+G04 Draw part c5*
+G04 Draw part c9*
+G04 Draw part c10*
+G04 Draw part c11*
+G04 Draw part v1*
+G04 Draw part f1*
+G04 Draw part d2*
+G04 Draw part b1*
+G04 Draw part b4*
+G04 Draw part b6*
+G04 Draw part b7*
+G04 Draw part b9*
+G04 Draw part d1*
+G04 Draw part d4*
+G04 Draw part d5*
+G04 Draw part d6*
+G04 Draw part d7*
+
+G04 Draw traces*
+
+G04 Draw Text*
+M00*
+M02*
