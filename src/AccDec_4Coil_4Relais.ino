@@ -37,6 +37,7 @@
 //#define USE_MULTIPLE_ADDRESS
 
 // Uncomment if you wont to set turnaut by onboard taster
+// Comment if you wont to use inputs as short detection to re-execute a faulty switch move (experimental)
 #define TASTER_COMMAND
 
 // ******** REMOVE THE "//" IN THE FOOLOWING LINE TO SEND / RECEIVE
@@ -53,7 +54,7 @@
 //#include <SoftwareServo.h> 
 
 #define HW_VERSION 10
-#define SW_VERSION 31
+#define SW_VERSION 32
 
 #define DECODER_ID 0
 
@@ -259,7 +260,6 @@ void notifyCVResetFactoryDefault()
 };
 
 
-#ifdef TASTER_COMMAND
 byte last_pos = HIGH;
 int tempo = 100;
 unsigned long lastPressTime[] = {0,0,0,0};
@@ -297,7 +297,23 @@ boolean pressed(byte in) {
 
   return false;
 }
-#endif
+
+static byte retryes[] = {0,0,0,0};
+
+boolean short_detect(byte in) {
+  if (millis() - temp[in] > 100) {
+    if (digitalRead(input[in]) == LOW) {
+      retryes[in]++;
+      if (retryes[in] > 3) {
+        retryes[in] = 0;
+        return false;
+      }
+      return true;
+    }
+  }
+  retryes[in] = 0;
+  return false;
+}
 
 void setup()   //******************************************************
 {
@@ -315,8 +331,6 @@ void setup()   //******************************************************
       digitalWrite(FBpins[i], 0);
       pinMode(Rpins[i], OUTPUT);
       digitalWrite(Rpins[i], 0);
-      //pinMode(input[i], OUTPUT);
-      //digitalWrite(input[i], 0);
       pinMode(input[i], INPUT_PULLUP);
      }
   pinMode(LED, OUTPUT);
@@ -405,7 +419,7 @@ void loop()   //****************************************************************
   for (int i=0; i < numfpins; i++) {
 
     if (ftn_queue[i].start_value == 1) {
-      if (ftn_queue[i].stop_value != ftn_queue[i].current_position) {
+      if (ftn_queue[i].stop_value != ftn_queue[i].current_position || retryes[i] > 0) {
         post_execution(i, ftn_queue[i].stop_value);
       }
     }
@@ -432,11 +446,22 @@ void loop()   //****************************************************************
 
   Dcc.process();
 
+  // taster command
   if(CV28.GetTaster()) {
     // command from puls pins
     for (int i=0; i < numfpins; i++) {
       if(pressed(i)) {
         exec_function(i, !ftn_queue[i].current_position );
+      }
+    }
+  }
+  // short detector on relè switch = reforce switch, something whent wrong so try to redo
+  else {
+    for (int i=0; i < numfpins; i++) {
+      if(ftn_queue[i].inuse==1) {
+        if (short_detect(i)) {
+          exec_function(i, ftn_queue[i].current_position );
+        }
       }
     }
   }
@@ -548,5 +573,6 @@ void post_execution(uint8_t function, uint8_t FuncState) {
     temp[function] = millis();
     ftn_queue[function].inuse = 1;
     ftn_queue[function].centre_value = 1;
+    ftn_queue[function].start_value = 0;
   }
 }
