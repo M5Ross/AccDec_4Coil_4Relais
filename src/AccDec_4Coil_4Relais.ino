@@ -54,7 +54,7 @@
 //#include <SoftwareServo.h> 
 
 #define HW_VERSION 10
-#define SW_VERSION 32
+#define SW_VERSION 33
 
 #define DECODER_ID 0
 
@@ -90,6 +90,7 @@ uint8_t CV_DECODER_MASTER_RESET =   120;  // THIS IS THE CV ADDRESS OF THE FULL 
 struct QUEUE
 {
   int16_t inuse;
+  int16_t start_routine;
   int16_t current_position;
   int16_t increment;
   int16_t stop_value;
@@ -118,12 +119,16 @@ CVPair FactoryDefaultCVs [] =
   {CV_TIME_DISACTIVE_OUTPUT, TIME_DISACTIVE_OUTPUT}, // tempo disattivazione output dopo un comando per evitare sovraccarico
   {CONF_CV, CONF_CV_DEFAULT},
   {31, 15},  // durata impulso
+  {33, 1},   // preposizionamento all'accensione
   {34, 0},   // posizione all'accensione
   {36, 15},  // durata impulso
+  {38, 1},   // preposizionamento all'accensione
   {39, 0},   // posizione all'accensione
   {41, 15},  // durata impulso
+  {43, 1},   // preposizionamento all'accensione
   {44, 0},   // posizione all'accensione
   {46, 15},  // durata impulso
+  {48, 1},   // preposizionamento all'accensione
   {49, 0},   // posizione all'accensione
 
   {CV_SINGLE_INV, 0},
@@ -335,23 +340,21 @@ void setup()   //******************************************************
      }
   pinMode(LED, OUTPUT);
   digitalWrite(LED, 1);
-
+  delay(3000);
 
   // Setup which External Interrupt, the Pin it's associated with that we're using 
   Dcc.pin(0, 2, 0);
   // Call the main DCC Init function to enable the DCC Receiver
   Dcc.init( MAN_ID_DIY, 100, FLAGS_OUTPUT_ADDRESS_MODE | FLAGS_DCC_ACCESSORY_DECODER, CV_To_Store_SET_CV_Address);
   
-  if (!Dcc.getCV(CV_Safe)) {
-    for(int i=0; i<60; i++) {
+  if (Dcc.getCV(CV_Safe) == 0) {
+    for(int i=0; i<10; i++) {
       delay(500);
       digitalWrite(LED, 1);
       delay(500);
       digitalWrite(LED, 0);
     }
   }
-  Dcc.setCV(CV_Safe, 0);
-  delay(1000);
    
   #if defined(DECODER_LOADED)
   if ( Dcc.getCV(CV_DECODER_MASTER_RESET)== CV_DECODER_MASTER_RESET ) 
@@ -362,8 +365,12 @@ void setup()   //******************************************************
          Dcc.setCV( FactoryDefaultCVs[j].CV, FactoryDefaultCVs[j].Value);
      }
 
+  Dcc.setCV(CV_Safe, 0);
   CV28.init();
 
+  // delay startup routine by decoder address to avoid sincronous startup for all decoders
+  delay(Dcc.getCV(CV_ACCESSORY_DECODER_ADDRESS_LSB) * 10);
+  
   tim_delay = Dcc.getCV( CV_TIME_DISACTIVE_OUTPUT ) * 10;
   
   for ( i=0; i < numfpins; i++) {
@@ -378,16 +385,18 @@ void setup()   //******************************************************
           ftn_queue[i].current_position = 1;
           Dcc.setCV( 34+(i*5), 1);
        }
-       
-       if(ftn_queue[i].current_position) {
-         digitalWrite(FApins[i], 1);
-         digitalWrite(FBpins[i], 0);
-         digitalWrite(Rpins[i], 1);
-       }
-       else {
-         digitalWrite(FApins[i], 0);
-         digitalWrite(FBpins[i], 1);
-         digitalWrite(Rpins[i], 0);
+
+       if (ftn_queue[i].start_routine > 0) {
+         if(ftn_queue[i].current_position) {
+           digitalWrite(FApins[i], 1);
+           digitalWrite(FBpins[i], 0);
+           digitalWrite(Rpins[i], 1);
+         }
+         else {
+           digitalWrite(FApins[i], 0);
+           digitalWrite(FBpins[i], 1);
+           digitalWrite(Rpins[i], 0);
+         }
        }
        if(CV28.GetPulse()) {
          delay(ftn_queue[i].increment);
@@ -476,6 +485,7 @@ void CVrefresh(uint8_t out) {
   }
   ftn_queue[out].single_invert = int (Dcc.getCV( CV_SINGLE_INV+out));
   ftn_queue[out].increment = 10 * int (char (Dcc.getCV( 31+(out*5))));
+  ftn_queue[out].start_routine = int (Dcc.getCV( 33+(out*5)));
   ftn_queue[out].current_position = int (Dcc.getCV( 34+(out*5)));
 }
 
